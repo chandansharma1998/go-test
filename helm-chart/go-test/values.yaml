@@ -1,0 +1,7 @@
+image:
+  repository: sharmachandan487/go-app
+  tag: latest
+
+service:
+  type: NodePort
+  port: 8080
