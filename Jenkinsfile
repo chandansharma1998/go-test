@@ -2,9 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
-        DOCKERHUB_USER = 'sharmachandan487'
         IMAGE_NAME = 'go-test'
+        DOCKERHUB_USER = 'sharmachandan487'
     }
 
     stages {
@@ -13,22 +12,26 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/chandansharma1998/go-test.git'
             }
         }
+
         stage('Docker build and push') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
-                        def app = docker.build("${DOCKERHUB_USER}/${IMAGE_NAME}:${env.BUILD_NUMBER}")
-                        app.push()
-                    }
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                    bat '''
+                        docker --version
+                        docker login -u %DOCKERHUB_USER% -p %DOCKERHUB_PASS%
+                        docker build -t %DOCKERHUB_USER%/%IMAGE_NAME%:%BUILD_NUMBER% .
+                        docker push %DOCKERHUB_USER%/%IMAGE_NAME%:%BUILD_NUMBER%
+                    '''
                 }
             }
         }
+
         stage('Deploy') {
             steps {
-                sh '''
-                helm upgrade --install go-test ./helm-chart/go-test \
-                --set image.repository=${DOCKERHUB_USER}/${IMAGE_NAME} \
-                --set image.tag=${BUILD_NUMBER}
+                bat '''
+                    helm upgrade --install go-test ./helm-chart/go-test ^
+                    --set image.repository=%DOCKERHUB_USER%/%IMAGE_NAME% ^
+                    --set image.tag=%BUILD_NUMBER%
                 '''
             }
         }
@@ -37,13 +40,13 @@ pipeline {
     post {
         success {
             mail to: "${env.GIT_COMMIT_AUTHOR_EMAIL}",
-                subject: "Pipeline Success: #${env.BUILD_NUMBER}",
-                body: "Build and deployment succeeded!"
+                 subject: "Pipeline Success: #${env.BUILD_NUMBER}",
+                 body: "Build and deployment succeeded!"
         }
         failure {
             mail to: "${env.GIT_COMMIT_AUTHOR_EMAIL}",
-                subject: "Pipeline Failed: #${env.BUILD_NUMBER}",
-                body: "Build or deployment failed. Please check Jenkins logs."
+                 subject: "Pipeline Failed: #${env.BUILD_NUMBER}",
+                 body: "Build or deployment failed. Please check Jenkins logs."
         }
     }
 }
