@@ -8,4 +8,4 @@ spec:
     app: go-test
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: 8080
+      targetPort: 8085
