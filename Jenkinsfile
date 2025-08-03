@@ -15,9 +15,11 @@ pipeline {
         }
         stage('Docker build and push') {
             steps {
-                docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
-                    def app = docker.build("${DOCKERHUB_USER}/${IMAGE_NAME}:${env.BUILD_NUMBER}")
-                    app.push()
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-creds') {
+                        def app = docker.build("${DOCKERHUB_USER}/${IMAGE_NAME}:${env.BUILD_NUMBER}")
+                        app.push()
+                    }
                 }
             }
         }
