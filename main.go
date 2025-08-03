@@ -37,10 +37,6 @@ func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 			"id":   "3",
 			"name": "test user 3",
 		},
-		{
-			"id":   "4",
-			"name": "test user 4",
-		},
 	}
 	userData, err := json.Marshal(users)
 	if err != nil {
