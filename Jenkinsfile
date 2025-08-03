@@ -35,6 +35,17 @@ pipeline {
                 '''
             }
         }
+
+        stage('Extract Commit Email') {
+            steps {
+                script {
+                    env.COMMIT_EMAIL = sh(
+                        script: "git log -1 --pretty=format:'%ae'",
+                        returnStdout: true
+                    ).trim()
+                }
+            }
+        }
     }
 
     post {
