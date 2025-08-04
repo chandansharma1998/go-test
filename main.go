@@ -14,7 +14,7 @@ func main() {
 	router.HandleFunc("/health", HealthCheck).Methods("GET")
 	router.HandleFunc("/users", GetAllUsers).Methods("GET")
 
-	fmt.Println("Server starting on PORT:", PORT)
+	fmt.Println("Server starting on PORT", PORT)
 	http.ListenAndServe(PORT, router)
 }
 
