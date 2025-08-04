@@ -43,6 +43,7 @@ pipeline {
                         script: 'git log -1 --pretty=format:"%%ae"',
                         returnStdout: true
                     ).trim()
+                    echo "Commit Author Email: ${email}"
                     env.COMMIT_EMAIL = email
                 }
             }
