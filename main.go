@@ -19,11 +19,13 @@ func main() {
 }
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("/health route called")
 	w.Write([]byte("ok"))
 	w.WriteHeader(http.StatusOK)
 }
 
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("/users route called")
 	users := []map[string]string{
 		{
 			"id":   "1",
@@ -43,5 +45,6 @@ func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	fmt.Println("Sending users data")
 	w.Write(userData)
 }

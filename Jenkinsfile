@@ -39,10 +39,11 @@ pipeline {
         stage('Extract Commit Email') {
             steps {
                 script {
-                    env.COMMIT_EMAIL = sh(
-                        script: "git log -1 --pretty=format:'%ae'",
+                    def email = bat(
+                        script: 'git log -1 --pretty=format:"%%ae"',
                         returnStdout: true
                     ).trim()
+                    env.COMMIT_EMAIL = email
                 }
             }
         }
@@ -50,14 +51,14 @@ pipeline {
 
     post {
         success {
-            mail to: "${env.GIT_COMMIT_AUTHOR_EMAIL}",
-                 subject: "Pipeline Success: #${env.BUILD_NUMBER}",
-                 body: "Build and deployment succeeded!"
+            mail to: "${env.COMMIT_EMAIL}",
+                subject: "Pipeline Success: #${env.BUILD_NUMBER}",
+                body: "Build and deployment succeeded!"
         }
         failure {
-            mail to: "${env.GIT_COMMIT_AUTHOR_EMAIL}",
-                 subject: "Pipeline Failed: #${env.BUILD_NUMBER}",
-                 body: "Build or deployment failed. Please check Jenkins logs."
+            mail to: "${env.COMMIT_EMAIL}",
+                subject: "Pipeline Failed: #${env.BUILD_NUMBER}",
+                body: "Build or deployment failed. Please check Jenkins logs."
         }
     }
 }
